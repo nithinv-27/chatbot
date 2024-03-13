@@ -1,5 +1,5 @@
 import streamlit as st
-from lang_bot import get_out_for_text_inp, stop_responding
+from lang_bot import get_out_for_text_inp
 
 #Title
 st.title('This is a title')
@@ -14,14 +14,11 @@ st.write(text_input)
 st.button("Submit", type="primary")
 
 if text_input:
-    if st.button("Stop responding", type="primary"):
-        stop_responding()
-    else:    
-        model_text_output = get_out_for_text_inp(text_input)
-        llama2_out = st.text_area(
-        "Llama2",
-        model_text_output
-        )
+    model_text_output = get_out_for_text_inp(text_input)
+    llama2_out = st.text_area(
+    "Llama2",
+    model_text_output
+    )
 
 #Returning user input to backend
 # print(type(title))
