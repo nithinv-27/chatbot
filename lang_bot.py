@@ -23,5 +23,3 @@ def get_out_for_text_inp(text_input):
     # input=text_prompt
     return chain.invoke({"input": input})
 
-def stop_responding():
-    os.kill(os.getpid(), signal.SIGTERM)
