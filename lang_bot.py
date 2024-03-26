@@ -27,21 +27,23 @@ def without_retrieval_chain(text_input):
     return chain.invoke({"input": text_input})
 
 #Retrieval chain
-# from langchain_community.document_loaders import WebBaseLoader
-# loader = WebBaseLoader("    ")
+from langchain_community.document_loaders import WebBaseLoader
+loader = WebBaseLoader("https://docs.smith.langchain.com/user_guide")
+
+docs = loader.load()
+
 ##Embeddings
 from langchain_community.embeddings import OllamaEmbeddings
 
 embeddings = OllamaEmbeddings()
 
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-loader = PyPDFLoader("input_pdfs/Profile.pdf")
-pages = loader.load_and_split()
 
- #Use Langchain to create the embeddings using text-embedding-ada-002
-db = FAISS.from_documents(documents=pages, embedding=embeddings)
-# docs = loader.load()
+text_splitter = RecursiveCharacterTextSplitter()
+documents = text_splitter.split_documents(docs)
+db = FAISS.from_documents(documents, embeddings)
+
 
 #save the embeddings into FAISS vector store
 db.save_local("./dbs/documentation/faiss_index")
@@ -72,48 +74,14 @@ qa = ConversationalRetrievalChain.from_llm(llm=llm,
                                             verbose=False)
 
 def ask_question_with_context(qa, question, chat_history):
-    query = "what is the full name of Nithin?"
     result = qa({"question": question, "chat_history": chat_history})
-    print("answer:", result["answer"])
-    chat_history = [(query, result["answer"])]
-    return chat_history
+    chat_history = [(question, result["answer"])]
+    return result["answer"]
+
 
 chat_history = []
-while True:
-    query = input('you: ')
-    if query == 'q':
-        break
-    chat_history = ask_question_with_context(qa, query, chat_history)
 
+def chat_with_bot(query, chat_history = chat_history):
+    result = ask_question_with_context(qa, query, chat_history)
+    return result
 
-# from langchain_community.vectorstores import FAISS
-# from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-
-# text_splitter = RecursiveCharacterTextSplitter()
-# documents = text_splitter.split_documents(docs)
-# vector = FAISS.from_documents(documents, embeddings)
-
-# from langchain.chains.combine_documents import create_stuff_documents_chain
-
-# prompt = ChatPromptTemplate.from_template("""Answer the following question based only on the provided context:
-
-# <context>
-# {context}
-# </context>
-
-# Question: {input}""")
-
-# document_chain = create_stuff_documents_chain(llm, prompt)
-
-# from langchain.chains import create_retrieval_chain
-
-# def with_retrieval_chain(text_input):
-
-#     retriever = vector.as_retriever()
-#     retrieval_chain = create_retrieval_chain(retriever, document_chain)
-
-#     response = retrieval_chain.invoke({"input": text_input})
-#     return response["answer"]
-
-# LangSmith offers several features that can help with testing:...
