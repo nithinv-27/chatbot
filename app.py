@@ -1,5 +1,5 @@
 import streamlit as st
-from lang_bot import get_out_for_text_inp
+from lang_bot import chat_with_bot
 
 #Title
 st.title('This is a title')
@@ -14,7 +14,7 @@ st.write(text_input)
 st.button("Submit", type="primary")
 
 if text_input:
-    model_text_output = get_out_for_text_inp(text_input)
+    model_text_output = chat_with_bot(query= text_input)
     llama2_out = st.text_area(
     "Llama2",
     model_text_output
